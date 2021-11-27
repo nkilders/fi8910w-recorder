@@ -20,7 +20,7 @@ import java.util.List;
 
 public class FI8910WRecorder {
     private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
-    private static final long VIDEO_LENGTH = 1000 * 60 * 1;
+    private static final long VIDEO_LENGTH = 1000 * 60 * 15;
     private static final String OUTPUT_DIR = "./videos";
 
     private BufferedInputStream inputStream;
