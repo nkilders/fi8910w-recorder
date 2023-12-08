@@ -3,6 +3,8 @@ package de.nkilders;
 import org.jcodec.api.SequenceEncoder;
 import org.jcodec.common.model.ColorSpace;
 import org.jcodec.scale.AWTUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -19,6 +21,8 @@ import java.util.Date;
 import java.util.List;
 
 public class FI8910WRecorder {
+    private static final Logger LOGGER = LoggerFactory.getLogger(FI8910WRecorder.class);
+
     private static final SimpleDateFormat SDF = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
     private static final long VIDEO_LENGTH = 1000 * 60 * 15;
     private static final String OUTPUT_DIR = "./videos";
@@ -43,7 +47,7 @@ public class FI8910WRecorder {
             URL url = new URL(String.format("http://%s/videostream.cgi?user=%s&pwd=%s", host, user, password));
             inputStream = new BufferedInputStream(url.openStream());
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.error("Could not open video stream", ex);
             return;
         }
 
@@ -81,7 +85,7 @@ public class FI8910WRecorder {
         try {
             inputStream.read(currentByte);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.error("Could not read from video stream", ex);
         }
     }
 
@@ -94,7 +98,7 @@ public class FI8910WRecorder {
                     15
             );
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.error("Could not create sequence encoder", ex);
         }
     }
 
@@ -105,16 +109,16 @@ public class FI8910WRecorder {
             BufferedImage frame = ImageIO.read(new ByteArrayInputStream(bytes));
             encoder.encodeNativeFrame(AWTUtil.fromBufferedImage(frame, ColorSpace.RGB));
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.error("Could not encode frame", ex);
         }
     }
 
     private void saveVideoAndRestartEncoder() {
         try {
             encoder.finish();
-            System.out.println("Successfully saved recording " + recordingFileName);
+            LOGGER.info("Successfully saved recording {}", recordingFileName);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOGGER.error("Could not save recording", ex);
         }
 
         startTime = System.currentTimeMillis();
